@@ -1,7 +1,7 @@
 import datetime
 import vertexai
 from zoneinfo import ZoneInfo
-from vertexai.language_models import Tool
+from vertexai.preview.reasoning_engines import Tool
 from vertexai.preview.language_models import ReasoningEngine
 
 # --- CONFIGURATION ---
