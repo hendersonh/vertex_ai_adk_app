@@ -1,7 +1,7 @@
 import datetime
 import vertexai
 from zoneinfo import ZoneInfo
-from vertexai.language_models import Tool
+from vertexai.preview.generative_models import FunctionDeclaration # New import
 from vertexai.preview.language_models import ReasoningEngine
 
 # --- CONFIGURATION ---
@@ -16,60 +16,32 @@ STAGING_BUCKET = "gs://chatbot-8ebb8-adk-staging"
 class WeatherTimeTools:
     """A collection of tools for getting weather and time."""
 
-    @Tool.from_function_schema(
-        name="get_weather",
-        description="Retrieves the current weather report for a specified city.",
-        input_schema={
-            "type": "object",
-            "properties": {
-                "city": {
-                    "type": "string",
-                    "description": "The name of the city to get the weather for."
-                }
-            },
-            "required": ["city"]
-        },
-        output_schema={
-            "type": "object",
-            "properties": {
-                "status": {"type": "string", "description": "Either 'success' or 'error'"},
-                "report": {"type": "string", "description": "The weather report if successful."},
-                "error_message": {"type": "string", "description": "Details of the error if status is 'error'."}
-            },
-            "required": ["status"]
-        }
-    )
     def get_weather(self, city: str) -> dict:
+        """Retrieves the current weather report for a specified city.
+
+        Args:
+            city (str): The name of the city to get the weather for.
+
+        Returns:
+            dict: A dictionary containing the status ('success' or 'error'),
+                  the weather report if successful, or an error message.
+        """
         print(f"Tool called: get_weather(city='{city}')")
         if city.lower() == "new york":
             return {"status": "success", "report": "The weather in New York is sunny with a temperature of 25 degrees Celsius (77 degrees Fahrenheit)."}
         else:
             return {"status": "error", "error_message": f"Weather information for '{city}' is not available."}
 
-    @Tool.from_function_schema(
-        name="get_current_time",
-        description="Returns the current time in a specified city.",
-        input_schema={
-            "type": "object",
-            "properties": {
-                "city": {
-                    "type": "string",
-                    "description": "The name of the city to get the current time for."
-                }
-            },
-            "required": ["city"]
-        },
-        output_schema={
-            "type": "object",
-            "properties": {
-                "status": {"type": "string", "description": "Either 'success' or 'error'"},
-                "report": {"type": "string", "description": "The current time report if successful."},
-                "error_message": {"type": "string", "description": "Details of the error if status is 'error'."}
-            },
-            "required": ["status"]
-        }
-    )
     def get_current_time(self, city: str) -> dict:
+        """Returns the current time in a specified city.
+
+        Args:
+            city (str): The name of the city to get the current time for.
+
+        Returns:
+            dict: A dictionary containing the status ('success' or 'error'),
+                  the current time report if successful, or an error message.
+        """
         print(f"Tool called: get_current_time(city='{city}')")
         if city.lower() == "new york":
             tz_identifier = "America/New_York"
@@ -96,13 +68,21 @@ def deploy_agent():
     vertexai.init(project=PROJECT_ID, location=LOCATION, staging_bucket=STAGING_BUCKET)
 
     # Instantiate your tool class
-    tools = WeatherTimeTools()
+    tool_definitions = WeatherTimeTools()
+
+    # Create FunctionDeclarations from the methods
+    get_weather_tool_declaration = FunctionDeclaration.from_func(
+        tool_definitions.get_weather
+    )
+    get_current_time_tool_declaration = FunctionDeclaration.from_func(
+        tool_definitions.get_current_time
+    )
 
     # Create the Reasoning Engine
     reasoning_engine = ReasoningEngine.create(
-        tools=[tools.get_weather, tools.get_current_time],
+        tools=[get_weather_tool_declaration, get_current_time_tool_declaration],
         model_name='gemini-1.5-flash-001', # Using a common and available model
-        display_name="Weather and Time Agent (Simplified)",
+        display_name="Weather and Time Agent (Simplified FD)", # Changed display name
     )
 
     print("Agent deployment complete!")
