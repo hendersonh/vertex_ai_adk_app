@@ -2,7 +2,7 @@ import datetime
 import vertexai
 from zoneinfo import ZoneInfo
 from vertexai.preview.generative_models import FunctionDeclaration # New import
-from vertexai.preview.language_models import ReasoningEngine
+from vertexai.preview.reasoning_engines import ReasoningEngine
 
 # --- CONFIGURATION ---
 # PLEASE EDIT THESE VALUES
