@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "python-aiplatform Docs": {
+      "url": "https://gitmcp.io/googleapis/python-aiplatform",
+      "disabled": false,
+      "autoApprove": [],
+      "alwaysAllow": [
+        "fetch_python_aiplatform_docs",
+        "search_python_aiplatform_docs"
+      ]
+    },
+    "adk-python Docs": {
+      "url": "https://gitmcp.io/google/adk-python",
+      "disabled": false,
+      "autoApprove": [],
+      "alwaysAllow": [
+        "search_adk_python_documentation"
+      ]
+    }
+  }
+}
